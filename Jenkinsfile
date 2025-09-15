@@ -6,7 +6,13 @@ pipeline {
             steps {
                 git 'https://github.com/siva-123-hash/samsung-mobile-site.git'
             }
+        } 
+        stage('Build') {
+            steps {
+                sh 'mvn clean package -DskipTests'
+            }
         }
+
 
         stage('Build Docker Image') {
             steps {
