@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/siva-123-hash/samsung-mobile-site.git'
+               git branch: 'main', url:'https://github.com/siva-123-hash/samsung-mobile-site.git'
             }
         } 
         stage('Build') {
