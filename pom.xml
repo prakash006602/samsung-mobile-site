@@ -1,0 +1,41 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                             https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.samsung</groupId>
+    <artifactId>samsung-mobile-site</artifactId>
+    <version>1.0.0</version>
+    <packaging>war</packaging>
+
+    <name>Samsung Mobile Website</name>
+    <description>Static Samsung Mobile Website packaged as WAR</description>
+
+    <build>
+        <finalName>samsung-mobile-site</finalName>
+        <plugins>
+            <!-- WAR plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.3.2</version>
+                <configuration>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                    <webResources>
+                        <resource>
+                            <directory>${basedir}</directory>
+                            <includes>
+                                <include>index.html</include>
+                                <include>css/**</include>
+                                <include>js/**</include>
+                                <include>images/**</include>
+                            </includes>
+                        </resource>
+                    </webResources>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+
