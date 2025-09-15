@@ -1,76 +1,45 @@
 pipeline {
     agent any
 
-    environment {
-        DOCKER_HUB_USER = 'siva0927'        // 🔹 your DockerHub username
-        IMAGE_NAME      = 'samsung-website'
-        IMAGE_TAG       = 'v1'
-    }
-
     stages {
-        stage('Build') {
+        stage('Checkout') {
             steps {
-                sh 'mvn clean package -DskipTests'
+                git 'https://github.com/siva-123-hash/samsung-mobile-site.git'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .'
+                script {
+                    sh 'docker build -t siva0927/samsung-site:v1 .'
+                }
             }
         }
 
         stage('Push to DockerHub') {
             steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'siva0927-dockerhub',  // 🔹 Jenkins credential ID
-                    usernameVariable: 'DOCKER_USER',
-                    passwordVariable: 'DOCKER_PASS'
-                )]) {
-                    sh '''
-                    echo "⚡ Logging into DockerHub..."
-                    echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-
-                    echo "⚡ Tagging image..."
-                    docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}
-
-                    echo "⚡ Pushing image..."
-                    docker push ${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}
-                    '''
+                withCredentials([usernamePassword(credentialsId: 'siva0927-dockerhub', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                    sh "echo $PASS | docker login -u $USER --password-stdin"
+                    sh "docker push siva0927/samsung-site:v1"
                 }
             }
         }
 
         stage('Run Container (Local Test)') {
             steps {
-                script {
-                    sh 'docker rm -f myapp-cont || true'
-                    sh 'docker run -d --name myapp-cont -p 8082:80 ${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}'
-
-                    // ✅ Show container logs in Jenkins console
-                    sh 'sleep 5 && docker logs myapp-cont'
-                }
+                sh 'docker run -d -p 8081:80 --name samsung-site-test siva0927/samsung-site:v1 || true'
             }
         }
 
         stage('Deploy to Docker Swarm') {
             steps {
-                script {
-                        // Check if swarm is active, otherwise initialize
-            def swarmCheck = sh(script: "docker info --format '{{.Swarm.LocalNodeState}}'", returnStdout: true).trim()
-            if (swarmCheck != "active") {
-                echo "Docker Swarm not initialized. Initializing now..."
-                sh 'docker swarm init || true'
-            }
-
-            // Remove old service if exists
-            sh 'docker service rm myapp-service || true'
-
-            // Deploy new service
-            sh 'docker service create --name myapp-service --publish 8082:8080 --replicas 5 siva0927/myapp:v1'
-                }
+                sh '''
+                docker service rm samsung-site || true
+                docker service create --name samsung-site -p 8081:80 siva0927/samsung-site:v1
+                '''
             }
         }
     }
 }
+
 
