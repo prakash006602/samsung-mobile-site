@@ -36,14 +36,5 @@ pipeline {
                 sh 'docker run -d -p 8081:80 --name samsung-site-test moses777/samsung-site:v1 || true'
             }
         }
-
-        stage('Deploy to Docker Swarm') {
-            steps {
-                sh '''
-                docker service rm samsung-site || true
-                docker service create --name samsung-site -p 8081:80 moses777/samsung-site:v1
-                '''
-            }
-        }
     }
 }
