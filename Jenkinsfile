@@ -17,7 +17,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh 'docker build -t moses777/samsung-site:v1 '
+                    sh 'docker build -t moses777/samsung:v1 .'
                 }
             }
         }
